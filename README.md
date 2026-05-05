@@ -85,7 +85,13 @@ Automated Notification to Participant
 
 ## 📸 Demo
 
-> 🎬 Live workflow demonstration available — showcasing the full automation pipeline from intake trigger to placement confirmation.
+> 🎬 Live workflow demonstration — showcasing the full automation pipeline from intake trigger to placement confirmation.
+
+### Workflow Overview
+![WIC Placement Automation Workflow](Portfolio.jpeg)
+
+### Workflow in Detail
+![WIC Placement Automation Detail](Portfolio%201.jpeg)
 
 ### Workflow Highlights:
 - Intake form submission triggers the workflow in real-time
@@ -99,13 +105,9 @@ Automated Notification to Participant
 
 ```
 n8n-placement-workflow/
-├── workflows/
-│   └── wic-placement-main.json    # Exportable n8n workflow file
-├── docs/
-│   ├── setup-guide.md             # How to import and configure
-│   └── architecture-diagram.png   # Workflow architecture visual
-├── sample-data/
-│   └── test-payload.json          # Sample trigger payload for testing
+├── WIC Placement Automation — Production v4.json   # Exportable n8n workflow file
+├── Portfolio.jpeg                                  # Workflow screenshot (overview)
+├── Portfolio 1.jpeg                                # Workflow screenshot (detail)
 └── README.md
 ```
 
