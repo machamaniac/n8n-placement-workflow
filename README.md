@@ -5,7 +5,7 @@
 ![n8n](https://img.shields.io/badge/Built%20with-n8n-EA4B71?style=for-the-badge&logo=n8n)
 ![Automation](https://img.shields.io/badge/Type-Workflow%20Automation-blue?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Live%20Demo-brightgreen?style=for-the-badge)
-![Healthcare](https://img.shields.io/badge/Domain-Healthcare-orange?style=for-the-badge)
+![Automation](https://img.shields.io/badge/Domain-Automation-orange?style=for-the-badge)
 
 ---
 
