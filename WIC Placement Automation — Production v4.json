@@ -1,0 +1,855 @@
+{
+  "name": "WIC Placement Automation — Production v4",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "start-placement-season",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "3ee2d0f3-acd5-4bf4-9597-06e83e911abc",
+      "name": "Start Placement Season",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "wic-placement-webhook"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1qKOw5CMyHicCiacoR5N2GktVIcy1Ps7Qw_8iLjbE6MQ",
+          "mode": "list",
+          "cachedResultName": "WIC tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKOw5CMyHicCiacoR5N2GktVIcy1Ps7Qw_8iLjbE6MQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1568438357,
+          "mode": "list",
+          "cachedResultName": "Sheet 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKOw5CMyHicCiacoR5N2GktVIcy1Ps7Qw_8iLjbE6MQ/edit#gid=1568438357"
+        },
+        "options": {}
+      },
+      "id": "7650a859-67e7-4795-b22f-ea4ca16945db",
+      "name": "Get row(s) in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PNBDVJLu0YSP0EF0",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "claude-haiku-4-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are the placement office at Waltham International College (WIC) in Barking, London.\n\nWrite a professional and warm placement assessment email to:\nStudent Name: {{ $json['Student Name'] }}\nEmployer: {{ $json['Employer'] }}\nPlacement Start Date: {{ $json['Placement Start Date'] }}\n\nThe email should:\n- Thank them for their hard work on placement\n- Ask them to complete and return the attached placement assessment form\n- Mention the deadline is in 2 weeks from today\n- Be friendly, encouraging and professional\n- Be under 150 words\n- Sound like it was written by a real person\n\nEnd with:\nKind regards,\nWIC Placement Team\nWaltham International College, Barking\n\nReturn only the email body. No subject line."
+            }
+          ]
+        },
+        "options": {
+          "system": "You write warm, professional placement emails on behalf of Waltham International College. Always be encouraging and natural. Never sound automated.",
+          "maxTokens": 400
+        }
+      },
+      "id": "69f7ca59-4141-4df4-afb4-144620071521",
+      "name": "Generate Placement Email",
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        480,
+        0
+      ],
+      "credentials": {
+        "anthropicApi": {
+          "id": "zouuBJIZFna3IuDu",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get row(s) in sheet').item.json['Student Email'] }}",
+        "subject": "=WIC Placement Assessment Form — Action Required, {{ $('Get row(s) in sheet').item.json['Student Name'] }}",
+        "emailType": "text",
+        "message": "={{ $json.content[0].text }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "WIC Placement Team"
+        }
+      },
+      "id": "d5a9dd26-de2f-46b7-aace-f777abcbae64",
+      "name": "Send Form to Student",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        0
+      ],
+      "webhookId": "358ce782-2a85-42b8-b4d0-aee194a42a57",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PGWGpsoEGLXl9Uay",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1qKOw5CMyHicCiacoR5N2GktVIcy1Ps7Qw_8iLjbE6MQ",
+          "mode": "list",
+          "cachedResultName": "WIC tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKOw5CMyHicCiacoR5N2GktVIcy1Ps7Qw_8iLjbE6MQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1941323507,
+          "mode": "list",
+          "cachedResultName": "Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKOw5CMyHicCiacoR5N2GktVIcy1Ps7Qw_8iLjbE6MQ/edit#gid=1941323507"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "Student ID",
+              "displayName": "Student ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Student Name",
+              "displayName": "Student Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Student Email",
+              "displayName": "Student Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Employer",
+              "displayName": "Employer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Form Sent",
+              "displayName": "Form Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Sent",
+              "displayName": "Date Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Form Received",
+              "displayName": "Form Received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Received",
+              "displayName": "Date Received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Form Status",
+              "displayName": "Form Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Employer Confirmed",
+              "displayName": "Employer Confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Chased",
+              "displayName": "Last Chased",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Action Required",
+              "displayName": "Action Required",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "threadId",
+              "displayName": "threadId",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "labelIds",
+              "displayName": "labelIds",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "07b99303-5a05-43cd-80b6-3292ab6b37d5",
+      "name": "Append row in sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        960,
+        0
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PNBDVJLu0YSP0EF0",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get row(s) in sheet').item.json['Employer Email'] }}",
+        "subject": "=WIC Student Placement Confirmation — {{ $('Get row(s) in sheet').item.json['Student Name'] }}",
+        "emailType": "text",
+        "message": "=Dear {{ $('Get row(s) in sheet').item.json['Employer Contact'] }},\n\nI hope this email finds you well.\n\nWe are writing to confirm the placement of our student {{ $('Get row(s) in sheet').item.json['Student Name'] }} at {{ $('Get row(s) in sheet').item.json['Employer'] }}.\n\nCould you please confirm the following:\n1. The student is attending their placement as expected\n2. You are happy with their performance so far\n3. You are able to complete and sign the employer section of their placement form\n\nPlease simply reply to this email to confirm.\n\nKind regards,\nWIC Placement Team\nWaltham International College, Barking",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "WIC Placement Team"
+        }
+      },
+      "id": "337a3336-6448-475f-a9fe-c11ddbc0f759",
+      "name": "Send Employer Confirmation Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        480,
+        -176
+      ],
+      "webhookId": "910a1ede-f055-4973-a627-4419d7e61646",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PGWGpsoEGLXl9Uay",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "aadia745@gmail.com",
+        "subject": "=WIC Placement Automation — Daily Summary {{ new Date().toLocaleDateString('en-GB') }}",
+        "emailType": "text",
+        "message": "=WIC PLACEMENT AUTOMATION — DAILY SUMMARY\n==========================================\n\nDate: {{ new Date().toLocaleDateString('en-GB') }}\n\nACTIONS COMPLETED:\n- Form emailed to: {{ $('Get row(s) in sheet').item.json['Student Name'] }}\n- Employer confirmation sent to: {{ $('Get row(s) in sheet').item.json['Employer'] }}\n- Tracker updated automatically\n\nSTUDENT DETAILS:\nName: {{ $('Get row(s) in sheet').item.json['Student Name'] }}\nEmail: {{ $('Get row(s) in sheet').item.json['Student Email'] }}\nEmployer: {{ $('Get row(s) in sheet').item.json['Employer'] }}\nForm Status: Pending\n\nNext auto-chase: In 5 days if no response.\n\n-- WIC Placement Automation by Abdul Hayee",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "WIC Automation System"
+        }
+      },
+      "id": "c719a061-34a6-4918-b030-bbafbbc3d85e",
+      "name": "Send Daily Summary to Manager",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        0
+      ],
+      "webhookId": "b2ecdd5f-a0b0-45f3-a9f5-35c33d0e0afa",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PGWGpsoEGLXl9Uay",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, message: 'Placement season started successfully', students_contacted: $('Get row(s) in sheet').all().length, timestamp: new Date().toISOString() }) }}",
+        "options": {}
+      },
+      "id": "835debc0-de03-4b63-9bf3-8b94e9c49feb",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "daysInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "6f9216bc-1f3e-44c4-8fb5-ecd7ed9e58c8",
+      "name": "Chase Trigger — Every 5 Days",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        512
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "YOUR_GOOGLE_SHEET_ID_HERE",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Tracker",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Form Received",
+              "lookupValue": "No"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fc38aaa8-1d01-4f1a-a17d-7bfc5d543c2f",
+      "name": "Get Non-Responders from Tracker",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        240,
+        512
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PNBDVJLu0YSP0EF0",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "claude-haiku-4-5"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are the placement office at Waltham International College (WIC) in Barking, London.\n\nWrite a friendly but firm reminder email to a student who has NOT returned their placement form.\n\nStudent Name: {{ $json['Student Name'] }}\nEmployer: {{ $json['Employer'] }}\nForm originally sent: {{ $json['Date Sent'] }}\n\nThe email should:\n- Be warm but make clear this is urgent\n- Remind them the deadline is approaching\n- Mention failure to return may affect course completion\n- Be under 120 words\n\nEnd with:\nKind regards,\nWIC Placement Team\n\nReturn only the email body. No subject line."
+            }
+          ]
+        },
+        "options": {
+          "system": "You write professional reminder emails for Waltham International College. Be warm but clear about urgency.",
+          "maxTokens": 300
+        }
+      },
+      "id": "1c941be6-66de-4d96-8320-a9cd195ddea7",
+      "name": "Generate Chase Email",
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        480,
+        512
+      ],
+      "credentials": {
+        "anthropicApi": {
+          "id": "zouuBJIZFna3IuDu",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get Non-Responders from Tracker').item.json['Student Email'] }}",
+        "subject": "=REMINDER: WIC Placement Form Outstanding — {{ $('Get Non-Responders from Tracker').item.json['Student Name'] }}",
+        "emailType": "text",
+        "message": "={{ $json.text }}",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "WIC Placement Team"
+        }
+      },
+      "id": "5aa23ebe-90a3-4ee5-869c-fe49c4f90634",
+      "name": "Send Chase Email to Student",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        512
+      ],
+      "webhookId": "db22b890-4c73-4ba2-8e29-38502c7f92e4",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PGWGpsoEGLXl9Uay",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1qKOw5CMyHicCiacoR5N2GktVIcy1Ps7Qw_8iLjbE6MQ",
+          "mode": "list",
+          "cachedResultName": "WIC tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKOw5CMyHicCiacoR5N2GktVIcy1Ps7Qw_8iLjbE6MQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1941323507,
+          "mode": "list",
+          "cachedResultName": "Tracker",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1qKOw5CMyHicCiacoR5N2GktVIcy1Ps7Qw_8iLjbE6MQ/edit#gid=1941323507"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Student ID",
+              "displayName": "Student ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Student Name",
+              "displayName": "Student Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Student Email",
+              "displayName": "Student Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Employer",
+              "displayName": "Employer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Form Sent",
+              "displayName": "Form Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Sent",
+              "displayName": "Date Sent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Form Received",
+              "displayName": "Form Received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date Received",
+              "displayName": "Date Received",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Form Status",
+              "displayName": "Form Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Employer Confirmed",
+              "displayName": "Employer Confirmed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Last Chased",
+              "displayName": "Last Chased",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Action Required",
+              "displayName": "Action Required",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "displayName": "Notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "fc0feed9-864b-48c0-b974-d0f13cbd7056",
+      "name": "Update Tracker — Chase Sent",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        960,
+        512
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "PNBDVJLu0YSP0EF0",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "aadia745@gmail.com",
+        "subject": "=⚠️ WIC — Student Needs Phone Call: {{ $('Get Non-Responders from Tracker').item.json['Student Name'] }}",
+        "emailType": "text",
+        "message": "=WIC PLACEMENT — URGENT ACTION REQUIRED\n========================================\n\nDate: {{ new Date().toLocaleDateString('en-GB') }}\n\nStudent has NOT responded after automated reminders:\n\nStudent: {{ $('Get Non-Responders from Tracker').item.json['Student Name'] }}\nEmail: {{ $('Get Non-Responders from Tracker').item.json['Student Email'] }}\nEmployer: {{ $('Get Non-Responders from Tracker').item.json['Employer'] }}\nForm Sent: {{ $('Get Non-Responders from Tracker').item.json['Date Sent'] }}\nLast Chased: {{ new Date().toLocaleDateString('en-GB') }}\n\nACTION: Please call this student directly.\n\n-- WIC Placement Automation by Abdul Hayee",
+        "options": {
+          "appendAttribution": false,
+          "senderName": "WIC Automation System"
+        }
+      },
+      "id": "5e13e034-6936-4094-bbc2-ef29a961536b",
+      "name": "Flag Student for Phone Call",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1200,
+        512
+      ],
+      "webhookId": "77026fe9-9b6e-49fb-9994-ba96a55cc0d5",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "PGWGpsoEGLXl9Uay",
+          "name": "Gmail OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start Placement Season": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Generate Placement Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Placement Email": {
+      "main": [
+        [
+          {
+            "node": "Send Form to Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Form to Student": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Send Employer Confirmation Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Send Daily Summary to Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Daily Summary to Manager": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chase Trigger — Every 5 Days": {
+      "main": [
+        [
+          {
+            "node": "Get Non-Responders from Tracker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Non-Responders from Tracker": {
+      "main": [
+        [
+          {
+            "node": "Generate Chase Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate Chase Email": {
+      "main": [
+        [
+          {
+            "node": "Send Chase Email to Student",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Chase Email to Student": {
+      "main": [
+        [
+          {
+            "node": "Update Tracker — Chase Sent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Tracker — Chase Sent": {
+      "main": [
+        [
+          {
+            "node": "Flag Student for Phone Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "11cfdd68-3d27-4e35-a428-dc229328170a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6501917e3abb4040d9dc8db14e90ee11f96632746be30f4e310518d430871870"
+  },
+  "id": "vjL6YuBTA3yuwfLj",
+  "tags": [
+    {
+      "name": "Production",
+      "id": "HxpIC5OUs9g1emi4",
+      "updatedAt": "2026-04-24T14:07:03.759Z",
+      "createdAt": "2026-04-24T14:07:03.759Z"
+    },
+    {
+      "name": "Placement",
+      "id": "OFzouulYv1SgcwwZ",
+      "updatedAt": "2026-04-24T14:07:03.717Z",
+      "createdAt": "2026-04-24T14:07:03.717Z"
+    },
+    {
+      "name": "WIC",
+      "id": "alz6DjwtFYVpwQao",
+      "updatedAt": "2026-04-24T14:07:03.670Z",
+      "createdAt": "2026-04-24T14:07:03.670Z"
+    }
+  ]
+}
